@@ -420,6 +420,7 @@
       align-items: center; 
       gap: 8px;
       box-shadow: var(--shadow-sm);
+      min-width: 180px;
     }
     
     .slide-tab:hover { 
@@ -844,6 +845,11 @@
       background: var(--bg-tertiary);
       transform: translateX(2px);
     }
+
+    .review-queue-item:first-child {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
     
     .mini-thumb { 
       width: 56px; 
@@ -1158,9 +1164,10 @@
       align-items: center; 
       gap: 10px; 
       margin: 8px 0;
-      padding: 8px 12px;
+      padding: 10px 16px;
       background: var(--bg-tertiary);
       border-radius: var(--radius);
+      width: 100%;
     }
     
     /* Focus States for Accessibility */
@@ -1236,7 +1243,7 @@
       <span>МНПЦЛИ</span>
     </div>
     <nav class="sidebar-nav">
-      <div class="nav-item active" data-view="dashboard">Панель управления</div>
+      <div class="nav-item active" data-view="dashboard">Сводка за день</div>
       <div class="nav-item" data-view="batch">Текущая партия <span class="nav-badge" id="batchBadge">5</span></div>
       <div class="nav-item" data-view="review">Очередь проверки <span class="nav-badge alert" id="reviewBadge">0</span></div>
       <div class="sidebar-divider"></div>
@@ -1245,7 +1252,7 @@
       <div class="nav-item" data-view="settings">Настройки</div>
     </nav>
     <div class="sidebar-status">
-      <span class="status-indicator"></span> v1.0.0
+      <span class="status-indicator"></span> v0.8.8-test
       <span id="userDisplay" style="margin-left: auto; font-weight: 500; color: var(--text-primary);"></span>
       <button id="logoutBtn" style="margin-left: 8px; padding: 4px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 12px; color: var(--text-secondary); transition: all 0.2s;" onmouseover="this.style.background='var(--bg-primary)'; this.style.borderColor='var(--border-dark)'" onmouseout="this.style.background='var(--bg-tertiary)'; this.style.borderColor='var(--border)'">Выйти</button>
     </div>
@@ -1255,9 +1262,6 @@
     <header class="header">
       <div class="header-breadcrumb">Партия <span id="headerBatchId">#B2026-0429</span> · Загружена 29.04.2026</div>
       <div class="header-info">
-        <div class="robot-indicator"><span class="robot-dot"></span> Манипулятор: test</div>
-        <div class="robot-indicator"><span class="robot-dot"></span> Робоскоп: test</div>
-        <div class="robot-indicator"><span class="robot-dot"></span> Сканер: test</div>
         <span id="headerUserDisplay" style="font-weight:500;"></span>
       </div>
     </header>
@@ -1532,6 +1536,16 @@
         canvas.width = canvas.height = 120;
         tile.appendChild(canvas);
         tile.addEventListener('click', () => selectScan(selectedSlideId, idx, tile));
+        // Добавляем прокрутку колесом
+        tile.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? 1 : -1;
+          let newIndex = idx + delta;
+          if (newIndex < 0) newIndex = slide.scans.length - 1;
+          if (newIndex >= slide.scans.length) newIndex = 0;
+          selectScan(selectedSlideId, newIndex, grid.children[newIndex]);
+          grid.children[newIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, { passive: false });
         grid.appendChild(tile);
         const img = new Image();
         img.onload = () => {
@@ -1887,9 +1901,9 @@
           </div>
           <div class="settings-group">
             <h3>Устройства</h3>
-            <div class="device-status"><span class="robot-dot"></span> Манипулятор: test</div>
-            <div class="device-status"><span class="robot-dot"></span> Робоскоп: test</div>
-            <div class="device-status"><span class="robot-dot"></span> Сканер штрихкодов: test</div>
+            <div class="device-status"><span class="robot-dot"></span> Манипулятор: робот-манипулятор</div>
+            <div class="device-status"><span class="robot-dot"></span> Робоскоп: робот-сканер</div>
+            <div class="device-status"><span class="robot-dot"></span> Сканер штрихкодов: сканер</div>
           </div>
         `;
         right.style.display = 'none';
@@ -1967,7 +1981,7 @@
         return;
       }
       container.innerHTML = reviewQueue.map((item, idx) => `
-        <div class="review-queue-item" onclick="openReviewItem('${item.slideId}',${item.index})" style="${idx===0?'border-color:#1e4bd2;background:#eef4ff;':''}">
+        <div class="review-queue-item" onclick="openReviewItem('${item.slideId}',${item.index})">
           <div class="mini-thumb"><canvas id="miniCanvas${idx}" width="52" height="52"></canvas></div>
           <div class="queue-item-info">
             <div class="queue-item-slide">${item.slideId} стекло ${item.index+1}</div>

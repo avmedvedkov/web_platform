@@ -1,1 +1,111 @@
-Nothing needs to be added to .gitignore since the changes only include source files (.py, .html) without any build artifacts, dependencies, or temporary files.
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+.venv/
+venv/
+.env
+.env.local
+.env.*
+node_modules/
+.julia/
+zig*/
+.jekyll-cache/
+.ruby-version
+.python-version
+.npm/
+.yarn/
+.pnp.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.cache
+*.pid
+*.seed
+*.prof
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+.apdisk
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+*.gcda
+*.gcno
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+.tox/
+nox/
+sphinx/_build/
+
+# Distribution
+*.tar.gz
+*.egg-info/
+*.whl
+dist/
+build/
+*.zip
+*.gz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar
+*.tgz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Images (if accidentally added)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+*.tiff
+*.svg
+*.ico
