@@ -5,6 +5,7 @@ __pycache__/
 *.obj
 dist/
 build/
+target/
 *.class
 *.exe
 *.dll
@@ -15,13 +16,18 @@ build/
 # Dependencies
 .venv/
 venv/
+.env
+.env.local
+.env.*
 node_modules/
-target/
-.gradle/
-.mypy_cache/
-.pytest_cache/
-julia-*/
+.julia/
 zig*/
+.jekyll-cache/
+.ruby-version
+.python-version
+.npm/
+.yarn/
+.pnp.*
 
 # Logs and temp files
 *.log
@@ -29,33 +35,50 @@ zig*/
 *.swp
 *.swo
 *.bak
-*.~*
-
-# Environment
-.env
-.env.local
-.env.*
+*.cache
+*.pid
+*.seed
+*.prof
 
 # Editors
 .vscode/
 .idea/
 *.swp
 *.swo
+.project
+.classpath
+.settings/
 
-# System
+# OS
 .DS_Store
 Thumbs.db
+ehthumbs.db
+Icon?
+.apdisk
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
+*.gcda
+*.gcno
 
-# Compressed files
+# Testing
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+.tox/
+nox/
+sphinx/_build/
+
+# Distribution
+*.tar.gz
+*.egg-info/
+*.whl
+dist/
+build/
 *.zip
 *.gz
-*.tar
-*.tgz
 *.bz2
 *.xz
 *.7z
@@ -70,7 +93,19 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
-*.tar.gz
+*.tar
+*.tgz
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Images (if accidentally added)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+*.tiff
+*.svg
+*.ico
