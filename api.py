@@ -130,11 +130,11 @@ async def get_stats():
     return processing_stats
 
 
-@app.get("/thumbnails/{slide}/{filename}", dependencies=[Depends(get_current_user)])
+@app.get("/thumbnails/{slide}/{filename}")
 async def thumbnail(
     slide: str, filename: str, size: int = Query(120)
 ):
-    """Сгенерировать и закешировать миниатюру (требуется авторизация)"""
+    """Сгенерировать и закешировать миниатюру (без авторизации для загрузки изображений)"""
     cache_key = f"{slide}/{filename}/{size}"
     if cache_key in thumbnail_cache:
         return StreamingResponse(
