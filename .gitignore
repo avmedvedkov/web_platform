@@ -1,1 +1,39 @@
-Nothing should be ignored based on the provided changes. The only modified file is 'api.py', which is a source code file and should not be added to .gitignore.
+```
+# Compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Editors and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies and build artifacts
+venv/
+.venv/
+node_modules/
+dist/
+build/
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+
+# System files
+.DS_Store
+Thumbs.db
+```

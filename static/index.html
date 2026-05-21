@@ -1315,8 +1315,28 @@
         hideLoginOverlay();
         fetchStatsData();
         fetchSlidesData();
+      } else {
+        // Если нет пользователя - показываем логин, но загружаем данные для превью
+        showLoginOverlay();
+        fetchSlidesDataPublic();
       }
     });
+
+    // Загрузка данных для публичного просмотра (без авторизации)
+    async function fetchSlidesDataPublic() {
+      try {
+        const res = await fetch('/api/slides-public');
+        if (res.ok) {
+          slidesData = await res.json();
+          const ids = Object.keys(slidesData);
+          if (ids.length > 0) {
+            selectedSlideId = ids[0];
+          }
+        }
+      } catch (e) {
+        console.warn('Публичные данные не загружены');
+      }
+    }
 
     // Загрузка данных
     async function fetchSlidesData() {
@@ -2027,6 +2047,9 @@
           showLoginOverlay();
           document.getElementById('userDisplay').textContent = '';
           document.getElementById('headerUserDisplay').textContent = '';
+          // Скрываем ошибку при разлогине
+          const loginError = document.getElementById('loginError');
+          if (loginError) loginError.style.display = 'none';
         });
       }
     });
