@@ -67,6 +67,120 @@
       -moz-osx-font-smoothing: grayscale;
     }
     
+    /* Login Modal */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-modal {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 420px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+    }
+    
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .login-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .form-input {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background: var(--bg-secondary);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    
+    .login-btn {
+      padding: 14px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 8px;
+    }
+    
+    .login-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .login-error {
+      background: var(--danger-light);
+      color: var(--danger-dark);
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+    }
+    
+    .login-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
     /* Sidebar */
     .sidebar { 
       width: 280px; 
@@ -1090,7 +1204,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <aside class="sidebar">
+  <!-- Login Modal -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-modal">
+      <div class="login-header">
+        <img src="favicon.svg" alt="Логотип" class="login-logo">
+        <h1 class="login-title">МНПЦЛИ</h1>
+        <p class="login-subtitle">Система распознавания энтеробиоза</p>
+      </div>
+      <div class="login-error" id="loginError">Неверный логин или пароль</div>
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="username">Логин</label>
+          <input type="text" id="username" class="form-input" placeholder="Введите логин" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Пароль</label>
+          <input type="password" id="password" class="form-input" placeholder="Введите пароль" autocomplete="current-password">
+        </div>
+        <button type="submit" class="login-btn">Войти в систему</button>
+      </form>
+      <div class="login-footer">
+        © 2026 МНПЦЛИ. Все права защищены.
+      </div>
+    </div>
+  </div>
+
+  <aside class="sidebar" id="mainSidebar" style="display:none;">
     <div class="sidebar-logo">
       <img src="favicon.svg" alt="Логотип" class="sidebar-logo-img">
       <span>МНПЦЛИ</span>
@@ -1350,7 +1490,7 @@
         <div class="detail-canvas-wrap"><canvas id="detailCanvas" width="360" height="360"></canvas></div>
         <button class="detail-fullscreen-btn" id="fullscreenBtn">Открыть снимок на весь экран</button>
         <div class="detail-info-block">
-          <div class="info-row"><span class="info-label">Тип</span><span class="info-value">${scan.scanType==='positive'?'Находка':scan.scanType==='error'?'Ошибка':'Чисто'}</span></div>
+          <div class="info-row"><span class="info-label">Тип</span><span class="info-value">${scan.scanType==='positive'?'Выявлено':scan.scanType==='error'?'Ошибка':'Чисто'}</span></div>
           <div class="info-row"><span class="info-label">Статус</span><span class="review-status ${statusClass}">${statusText}</span></div>
           ${scan.scanType==='positive' ? `
           <div class="info-row"><span class="info-label">Объектов</span><span class="info-value">${scan.numEggs} яиц</span></div>
@@ -1365,7 +1505,6 @@
           <button class="btn btn-confirm" onclick="confirmScan()">Подтвердить</button>
           <button class="btn btn-reject" onclick="rejectScan()">Отклонить</button>
           <button class="btn btn-rescan" onclick="rescanScan()">Пересканировать</button>
-          <button class="btn btn-skip" onclick="skipScan()">Следующий</button>
         </div>
       `;
       const detailCanvas = document.getElementById('detailCanvas');
@@ -1405,21 +1544,6 @@
       showToast(`Отклонено — ${selectedSlideId} стекло ${selectedScanIndex+1}`);
     }
     function rescanScan() { showToast('Запрос на пересканирование'); }
-    function skipScan() {
-      if (reviewQueue.length === 0) { showToast('Очередь пуста'); return; }
-      const next = reviewQueue[0];
-      selectedSlideId = next.slideId;
-      selectedScanIndex = next.index;
-      renderSlideTabs();
-      renderScanGrid();
-      showDetail(next.slideId, next.index);
-      const tile = document.querySelector(`.scan-tile[data-key="${next.slideId}-${next.index}"]`);
-      if (tile) {
-        document.querySelectorAll('.scan-tile.selected').forEach(t => t.classList.remove('selected'));
-        tile.classList.add('selected');
-        tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
 
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
@@ -1613,7 +1737,7 @@
             <div class="scan-grid-title">Изображения стекла <span id="currentSlideLabel" style="color:#1e4bd2;">${selectedSlideId}</span> <span style="font-weight:400;font-size:14px;color:#64748b;">(всего <span id="totalScansLabel">0</span>)</span></div>
             <div class="scan-grid-legend">
               <span class="legend-item"><span class="legend-box neg"></span> Чисто</span>
-              <span class="legend-item"><span class="legend-box pos"></span> Находка</span>
+              <span class="legend-item"><span class="legend-box pos"></span> Выявлено</span>
               <span class="legend-item"><span class="legend-box err"></span> Ошибка</span>
               <span class="legend-item"><span class="legend-box rev"></span> На проверке</span>
             </div>
@@ -1634,7 +1758,7 @@
           <div style="font-weight:700;font-size:17px;">Архив партий</div>
           <div class="table-wrapper">
             <table>
-              <thead><tr><th>ID партии</th><th>Дата</th><th>Стёкол</th><th>Находок</th><th>Ошибок</th><th>Статус</th></tr></thead>
+              <thead><tr><th>ID партии</th><th>Дата</th><th>Стёкол</th><th>Выявлено</th><th>Ошибок</th><th>Статус</th></tr></thead>
               <tbody>
                 <tr><td>#B2026-0421</td><td>21.04.2026</td><td>10</td><td>3</td><td>1</td><td>Завершена</td></tr>
                 <tr><td>#B2026-0414</td><td>14.04.2026</td><td>8</td><td>5</td><td>0</td><td>Завершена</td></tr>
@@ -1693,7 +1817,7 @@
         <p>Среднее время на файл: <strong>${statsData.average_inference_ms} мс</strong></p>
         <p>Средняя скорость: <strong>${statsData.speed} файлов/с</strong></p>
         <p style="margin-top:8px;"><em>Сводка по слайдам:</em></p>
-        <ul>${statsData.slides_summary.map(s => `<li>${s.slide}: ${s.count} файлов, находок: ${s.positive}, ошибок: ${s.errors}</li>`).join('')}</ul>
+        <ul>${statsData.slides_summary.map(s => `<li>${s.slide}: ${s.count} файлов, выявлено: ${s.positive}, ошибок: ${s.errors}</li>`).join('')}</ul>
       `;
     }
 
@@ -1722,7 +1846,7 @@
         pos += s.stats.positive; neg += s.stats.negative; err += s.stats.errors; pend += s.stats.pendingReview;
       }
       document.getElementById('statsCards').innerHTML = `
-        <div class="stat-card pos"><div class="stat-value">${pos}</div><div class="stat-label">Находок</div></div>
+        <div class="stat-card pos"><div class="stat-value">${pos}</div><div class="stat-label">Выявлено</div></div>
         <div class="stat-card"><div class="stat-value">${neg}</div><div class="stat-label">Чистых</div></div>
         <div class="stat-card err"><div class="stat-value">${err}</div><div class="stat-label">Ошибок</div></div>
         <div class="stat-card pend"><div class="stat-value">${pend}</div><div class="stat-label">На проверке</div></div>
@@ -1737,7 +1861,7 @@
              onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''"
              onclick="selectedSlideId='${id}'; switchView('batch');">
           <span style="font-weight:700;">${id}</span>
-          <span style="color:#dc2626;">${slide.stats.positive} находок</span>
+          <span style="color:#dc2626;">${slide.stats.positive} выявлено</span>
           <span style="color:#d97706;">${slide.stats.errors} ошибок</span>
           <span style="color:#1e4bd2;">${slide.stats.pendingReview} на проверке</span>
         </div>
@@ -1756,7 +1880,7 @@
           <div class="mini-thumb"><canvas id="miniCanvas${idx}" width="52" height="52"></canvas></div>
           <div class="queue-item-info">
             <div class="queue-item-slide">${item.slideId} стекло ${item.index+1}</div>
-            <div class="queue-item-meta">${item.scanData.scanType==='positive'?`Находка · ${item.scanData.numEggs} яиц · ${item.scanData.confidence}%`:`Ошибка: ${item.scanData.errorType||'неизвестно'}`}</div>
+            <div class="queue-item-meta">${item.scanData.scanType==='positive'?`Выявлено · ${item.scanData.numEggs} яиц · ${item.scanData.confidence}%`:`Ошибка: ${item.scanData.errorType||'неизвестно'}`}</div>
           </div>
           <div class="queue-actions">
             <button class="btn btn-confirm" style="padding:8px 16px;" onclick="event.stopPropagation();quickConfirm('${item.slideId}',${item.index})">Да</button>
@@ -1811,7 +1935,6 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key.toLowerCase() === 'y' && selectedSlideId && selectedScanIndex !== null) { e.preventDefault(); confirmScan(); }
       else if (e.key.toLowerCase() === 'n' && selectedSlideId && selectedScanIndex !== null) { e.preventDefault(); rejectScan(); }
-      else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); skipScan(); }
       else if (e.key === '1') switchView('dashboard');
       else if (e.key === '2') switchView('batch');
       else if (e.key === '3') switchView('review');
