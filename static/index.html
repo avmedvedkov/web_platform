@@ -1262,7 +1262,7 @@
       </div>
     </header>
 
-    <div class="content" id="mainContent">
+    <div class="content" id="contentArea">
       <div class="panel-center" id="panelCenter"></div>
       <div class="panel-right" id="panelRight">
         <div class="detail-placeholder" id="detailPlaceholder">
@@ -2044,12 +2044,12 @@
           selectedSlideId = null;
           selectedScanIndex = null;
           reviewQueue = [];
-          showLoginOverlay();
-          document.getElementById('userDisplay').textContent = '';
-          document.getElementById('headerUserDisplay').textContent = '';
-          // Скрываем ошибку при разлогине
+          // Скрываем ошибку и интерфейс перед показом окна входа
           const loginError = document.getElementById('loginError');
           if (loginError) loginError.style.display = 'none';
+          document.getElementById('userDisplay').textContent = '';
+          document.getElementById('headerUserDisplay').textContent = '';
+          showLoginOverlay();
         });
       }
     });

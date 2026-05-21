@@ -124,6 +124,12 @@ async def get_slides():
     return slides_data
 
 
+@app.get("/api/slides-public")
+async def get_slides_public():
+    """Получить данные по всем слайдам (публичный доступ для загрузки фото)"""
+    return slides_data
+
+
 @app.get("/api/stats", dependencies=[Depends(get_current_user)])
 async def get_stats():
     """Статистика обработки (требуется авторизация)"""
