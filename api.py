@@ -4,12 +4,15 @@
 """
 
 import io
+import secrets
 from pathlib import Path
 from typing import Dict, Any
+from datetime import datetime, timedelta
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, HTTPException, Query, Request, Depends, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from PIL import Image
 
 from config import SCANS_DIR
@@ -20,6 +23,33 @@ processing_stats: Dict[str, Any] = {}
 thumbnail_cache: Dict[str, bytes] = {}
 
 app = FastAPI(title="МНПЦЛИ Энтеробиоз API")
+
+# Простая система аутентификации
+security = HTTPBasic()
+
+# Заглушка пользователей (в продакшене использовать БД)
+USERS_DB = {
+    "admin": "admin",
+    "doctor": "doctor123",
+    "lab": "lab2024"
+}
+
+def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+    """Проверка логина и пароля"""
+    correct_password = USERS_DB.get(credentials.username)
+    if not correct_password or credentials.password != correct_password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверный логин или пароль",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
+
+
+def optional_auth(request: Request):
+    """Опциональная авторизация для публичных эндпоинтов"""
+    # Для статики и favicon авторизация не требуется
+    return True
 
 
 # ----- Вспомогательная валидация вместо Pydantic -----
@@ -67,23 +97,44 @@ async def favicon():
     raise HTTPException(status_code=404)
 
 
-@app.get("/api/slides")
+@app.post("/api/login")
+async def login(request: Request):
+    """
+    Эндпоинт для входа пользователя
+    Принимает JSON: {"username": "...", "password": "..."}
+    Возвращает: {"success": true, "username": "..."} или ошибку 401
+    """
+    body = await request.json()
+    username = body.get("username")
+    password = body.get("password")
+    
+    if not username or not password:
+        raise HTTPException(status_code=422, detail="Логин и пароль обязательны")
+    
+    correct_password = USERS_DB.get(username)
+    if not correct_password or password != correct_password:
+        raise HTTPException(status_code=401, detail="Неверный логин или пароль")
+    
+    return {"success": True, "username": username}
+
+
+@app.get("/api/slides", dependencies=[Depends(get_current_user)])
 async def get_slides():
-    """Получить данные по всем слайдам"""
+    """Получить данные по всем слайдам (требуется авторизация)"""
     return slides_data
 
 
-@app.get("/api/stats")
+@app.get("/api/stats", dependencies=[Depends(get_current_user)])
 async def get_stats():
-    """Статистика обработки"""
+    """Статистика обработки (требуется авторизация)"""
     return processing_stats
 
 
-@app.get("/thumbnails/{slide}/{filename}")
+@app.get("/thumbnails/{slide}/{filename}", dependencies=[Depends(get_current_user)])
 async def thumbnail(
     slide: str, filename: str, size: int = Query(120)
 ):
-    """Сгенерировать и закешировать миниатюру"""
+    """Сгенерировать и закешировать миниатюру (требуется авторизация)"""
     cache_key = f"{slide}/{filename}/{size}"
     if cache_key in thumbnail_cache:
         return StreamingResponse(
@@ -111,10 +162,10 @@ async def thumbnail(
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@app.post("/api/review")
+@app.post("/api/review", dependencies=[Depends(get_current_user)])
 async def update_review(request: Request):
     """
-    Обновить статус проверки конкретного скана
+    Обновить статус проверки конкретного скана (требуется авторизация)
     Принимает JSON: {"slideId": "...", "index": 0, "status": "confirmed"}
     """
     body = await request.json()
