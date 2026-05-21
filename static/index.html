@@ -431,11 +431,10 @@
     }
     
     .slide-tab.active { 
-      border-color: var(--primary); 
-      background: var(--primary-light); 
-      color: var(--primary-dark); 
+      border-color: #1e4bd2; 
+      background: #eef4ff; 
+      color: #1e4bd2; 
       font-weight: 600;
-      box-shadow: 0 0 0 3px var(--primary-light);
     }
     
     .tab-dot { 
@@ -444,10 +443,10 @@
       border-radius: 50%; 
       flex-shrink: 0;
     }
-    .tab-dot.pos { background: var(--danger); }
-    .tab-dot.err { background: var(--warning); }
-    .tab-dot.clean { background: var(--success); }
-    .tab-dot.pend { background: var(--primary); }
+    .tab-dot.pos { background: #dc2626; }
+    .tab-dot.err { background: #d97706; }
+    .tab-dot.clean { background: #16a34a; }
+    .tab-dot.pend { background: #93c5fd; }
     
     /* Scan Grid Header */
     .scan-grid-header { 
@@ -484,10 +483,10 @@
       border-radius: 4px; 
       flex-shrink: 0; 
     }
-    .legend-box.neg { background: var(--bg-tertiary); border: 1px solid var(--border-dark); }
-    .legend-box.pos { background: var(--danger-light); border: 1px solid var(--danger); }
-    .legend-box.err { background: var(--warning-light); border: 1px solid var(--warning); }
-    .legend-box.rev { background: transparent; border: 2px dashed var(--primary); }
+    .legend-box.neg { background: #d1d5db; border: 1px solid #9ca3af; }
+    .legend-box.pos { background: #fecaca; border: 1px solid #dc2626; }
+    .legend-box.err { background: #fed7aa; border: 1px solid #d97706; }
+    .legend-box.rev { background: #fff; border: 2px solid #1e4bd2; }
     
     /* Scan Grid */
     .scan-grid-container {
@@ -531,19 +530,19 @@
     }
     
     .scan-tile.positive { 
-      border-color: var(--danger-light); 
-      background: linear-gradient(135deg, #fef2f2 0%, var(--bg-tertiary) 100%);
+      border-color: #fca5a5; 
+      background: #fef2f2;
     }
     
     .scan-tile.error-scan { 
-      border-color: var(--warning-light); 
-      background: linear-gradient(135deg, #fffbeb 0%, var(--bg-tertiary) 100%);
+      border-color: #fcd34d; 
+      background: #fffbeb;
     }
     
     .scan-tile.needs-review { 
       border-style: dashed; 
-      border-color: var(--primary);
-      background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg-tertiary) 100%);
+      border-color: #1e4bd2;
+      background: #eef4ff;
     }
     
     .scan-tile canvas { 
@@ -1610,6 +1609,7 @@
           <button class="btn btn-confirm" onclick="confirmScan()">Подтвердить</button>
           <button class="btn btn-reject" onclick="rejectScan()">Отклонить</button>
           <button class="btn btn-rescan" onclick="rescanScan()">Пересканировать</button>
+          <button class="btn btn-skip" onclick="skipScan()">Следующий</button>
         </div>
       `;
       const detailCanvas = document.getElementById('detailCanvas');
@@ -1649,6 +1649,25 @@
       showToast(`Отклонено — ${selectedSlideId} стекло ${selectedScanIndex+1}`);
     }
     function rescanScan() { showToast('Запрос на пересканирование'); }
+    
+    function skipScan() {
+      if (reviewQueue.length === 0) {
+        showToast('Очередь пуста');
+        return;
+      }
+      const next = reviewQueue[0];
+      selectedSlideId = next.slideId;
+      selectedScanIndex = next.index;
+      renderSlideTabs();
+      renderScanGrid();
+      showDetail(next.slideId, next.index);
+      const tile = document.querySelector(`.scan-tile[data-key="${next.slideId}-${next.index}"]`);
+      if (tile) {
+        document.querySelectorAll('.scan-tile.selected').forEach(t => t.classList.remove('selected'));
+        tile.classList.add('selected');
+        tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
 
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
@@ -2072,6 +2091,7 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       if (e.key.toLowerCase() === 'y' && selectedSlideId && selectedScanIndex !== null) { e.preventDefault(); confirmScan(); }
       else if (e.key.toLowerCase() === 'n' && selectedSlideId && selectedScanIndex !== null) { e.preventDefault(); rejectScan(); }
+      else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); skipScan(); }
       else if (e.key === '1') switchView('dashboard');
       else if (e.key === '2') switchView('batch');
       else if (e.key === '3') switchView('review');
