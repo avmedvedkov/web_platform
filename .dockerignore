@@ -1,0 +1,24 @@
+# МНПЦЛИ Энтеробиоз - .dockerignore
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv
+env
+.env
+*.log
+logs
+.pytest_cache
+.coverage
+htmlcov
+*.egg-info
+dist
+build
+*.md
+!README.md
+.dockerignore
+Dockerfile
+docker-compose.yml
